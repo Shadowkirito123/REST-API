@@ -1,0 +1,22 @@
+databases:
+  - name: projectsdb
+    plan: free
+    databaseName: projects
+    user: projects
+
+services:
+  - type: web
+    plan: free
+    name: projects
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "python -m gunicorn projects.asgi:application -k uvicorn.workers.UvicornWorker"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: projectsdb
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: 4
